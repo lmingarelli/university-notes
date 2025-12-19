@@ -16,17 +16,20 @@ s=5 --> A = [1,1,2,2,0,0]
 def minDistancesBFS(s, M):
     # Return a vector containing the distances of every node from s
     nRows = len(M)
-    # Distance of all nodes from s
+    # minDistances[i] is the distance between the the node i and the node s
     minDistances = [-1] * nRows
     minDistances[s] = 0
+    # Queue of nodes to visit
     queue = [s]
     i = 0
 
-    while len(queue) > i:
+    # This cycle costs O(n) (one cycle for every node in the graph)
+    while len(queue) > i:   
             currentNode = queue[i]
             i += 1
             # Loop every column of the matrix
-            for j in range(nRows):
+            # Its cost is O(n) 
+            for j in range(nRows):      
                 # If there is an arch between currentNode and j and no
                 # distance from s has been registered
                 if M[currentNode][j] == 1 and minDistances[j] == -1:
@@ -52,3 +55,12 @@ targetDistance = 1
 A = [0] * len(M)
 for i in range(len(minDistances)):
     A[ minDistances[i] ] += 1
+
+"""
+Complexity is O(n) * O(n) = O(n^2)
+The algorithm correctly calculate the requested list A:
+1.  It calculate the vector minDistances containing the minimum distance from 
+    s of all the graph nodes.
+2.  Create the vector A initializing it with all zeros
+3.  Uses the info inside minDistances to insert the values into the array A
+"""
