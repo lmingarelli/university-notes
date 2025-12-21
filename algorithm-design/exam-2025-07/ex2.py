@@ -11,9 +11,9 @@ O(nm) time.
 
 Solution: the dynamic programming technique
 We can minimize the problem starting from "We want to count how many times
-s1 appears as a subsequence in s." and breaking it down into smaller 
-subproblems: "How many subsequences of s1[:j] (smaller than s1) are in
-s[:i] (smaller than s)?".
+s1 appears as a subsequence in s" and breaking it down into smaller 
+subproblems: "We want to count how many times s1[:j] (smaller than s1) appears
+as a subsequence in s[:i] (smaller than s)?".
 
 I'll use a matrix (n+1) x (m+1) where M[i][j] is the number of subsequences
 of s[:i] (the first i characters of s) that equals s1[:j] (the first j 
@@ -56,21 +56,21 @@ g [1,3,4,5]
 def es2(s, s1):
     n, m = len (s), len(s1)
     # M[i][j] is the number of subsequences of s[:i] that equals s1[:j]
+    M = [[0 for _ in range(m+1)] for _ in range(n+1)]
+    for i in range(n+1):
+        for j in range(m+1):
+            if j == 0:
+                M[i][j] = 1
+            elif i != 0:
+                if s[i-1] == s1[j-1]:
+                    M[i][j] = M[i-1][j] + M[i-1][j-1]
+                else:
+                    M[i][j] = M[i-1][j]
+            print(M[i][j] , end=" ")
+        print()
+    return M[n][m]
 
-""" result = []
-s = "babgbag"
-s1 = "bag"
-for i in range(len(s)):
-    temp = [0] * len(s1)
-    charSearchedInSubstr = 0
-    j = i
-
-    if s[i]==s1[0]:
-        temp[0] = s[i]
-        charSearchedInSubstr += 1
-        j += 1
-    
-    while j < len(s)-i:
-        if s[j] == s1[charSearchedInSubstr]:
-            temp[0]
- """
+s="babgbag"
+s1="bag"
+print("The number of way you can find",s1,"as a subsequence in",s,"is:",
+es2("babgbag", "bag"))  # Expected output: 5
