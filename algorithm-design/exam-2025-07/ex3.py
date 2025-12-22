@@ -13,31 +13,41 @@ following 16 must be printed:
 
 The algorithm must run in O(n^2 (S(n))) time, where S(n) is the number of 
 matrices to be printed.
+
+Solution
+Let's use an backtracking approach to generate all valid quaternary matrices.
+To have an algorithmic complexity of O(n^2 * S(n)), we will fill the matrix 
+cell by cell, using only values that will lead to valid matrices (when
+adding following cells during the recursive calls). To achieve that we can
+check that for cells which index sum is even contain 0 or 2, while cells whose
+index sum is odd contain 1 or 3.
 """
-global callNumber
-callNumber = 0
 
 def es3(n):
   sol = [[0]*n for _ in range(n)]
-  backtrackPerm(n, 0, 0, sol, 0)
+  backtrackPerm(n, 0, 0, sol)
 
-def backtrackPerm(n, r, c, sol, callNumber):
+def backtrackPerm(n, r, c, sol):
+  # Move to the next row if we reached the end of the current row
   if c == n:
-    print("Reached end of row", r, "moving to next row")
     r += 1
     c = 0
+
+  # If we filled all rows, print the solution
   if r == n:
-    print("Completed matrix:")
     for k in range(n):
       print(sol[k])
-    print()
     return
+  
+  # Choose possible values based on the sum of indices
   A = [0,2]
   if r+c % 2 == 1:
     A = [1,3]
+
+  # Choose each value and continue the backtracking
   for val in A:
     sol[r][c] = val
-    print("Calling backtrackPerm from call number", callNumber, "with r =", r, "c =", c+1, "sol =", sol)
-    backtrackPerm(n, r, c+1, sol, callNumber+1)
+    # Calculate all possibile valid permutations choosing val as sol[r][c]
+    backtrackPerm(n, r, c+1, sol)
 
 es3(2)
