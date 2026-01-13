@@ -13,12 +13,12 @@ s=2 --> A = [1,2,3,0,0,0]
 s=5 --> A = [1,1,2,2,0,0]
 """
 
-def minDistancesBFS(s, M):
+def distancesBFS(s, M):
     # Return a vector containing the distances of every node from s
     nRows = len(M)
-    # minDistances[i] is the distance between the the node i and the node s
-    minDistances = [-1] * nRows
-    minDistances[s] = 0
+    # dist[i] is the distance between the the node i and the node s
+    dist = [-1] * nRows
+    dist[s] = 0
     # Queue of nodes to visit
     queue = [s]
     i = 0
@@ -32,10 +32,10 @@ def minDistancesBFS(s, M):
             for j in range(nRows):      
                 # If there is an arch between currentNode and j and no
                 # distance from s has been registered
-                if M[currentNode][j] == 1 and minDistances[j] == -1:
-                    minDistances[j] = minDistances[currentNode] + 1
+                if M[currentNode][j] == 1 and dist[j] == -1:
+                    dist[j] = dist[currentNode] + 1
                     queue.append(j)
-    return minDistances
+    return dist
 
 # Adjacency matrix
 M = [
@@ -47,14 +47,14 @@ M = [
     [1,0,0,0,0,0]
 ]
 startingNode = 2
-minDistances = minDistancesBFS(startingNode, M)
+distances = distancesBFS(startingNode, M)
 # Following the example, and using 2 as a starting node this array should be 
 # [1,2,0,1,2,2]
 targetDistance = 1
 # A is the array we have to return
 A = [0] * len(M)
-for i in range(len(minDistances)):
-    A[ minDistances[i] ] += 1
+for i in range(len(distances)):
+    A[ distances[i] ] += 1
 
 """
 Complexity is O(n) * O(n) = O(n^2)
