@@ -24,8 +24,8 @@ char *pls_create(char *init, int len) {
 
 /* Display the string 's' on the screen. */
 void pls_print (char *s) {
-    struct pls *p = s - sizeof(*p);
-    for (int i=0; i < p->len; i++) {
+    struct pls *p = (struct pls*) (s - sizeof(*p));
+    for (int i=0; (uint32_t)i < p->len; i++) {
         putchar(p->str[i]);
     }
     printf("\n");
@@ -36,9 +36,10 @@ void pls_free(char *s) {
 }
 
 void pls_release(char *s) {
-    struct pls *p = s - sizeof(*p);
+    struct pls *p = (struct pls*) (s - sizeof(*p));
+    printf("Current refcount is %d\n", p->refcount);
     if (p->refcount == 0) {
-        printf("ABORTED ON FREE ERROR");
+        printf("ABORTED ON FREE ERROR\n");
         exit(1);
     }
 
@@ -46,14 +47,32 @@ void pls_release(char *s) {
     if (p->refcount == 0) pls_free(s);
 }
 
+void pls_retain(char *s) {
+    struct pls *p = (struct pls*) (s - sizeof(*p));
+    if (p->refcount == 0) {
+        printf("ABORTED ON RETAIN OF ILLEGAL STRING\n");
+        exit(1);
+    }
+    p->refcount++;
+}
+
 int pls_len(char *s) {
-    struct pls *p = s - sizeof(*p);
+    struct pls *p = (struct pls*) (s - sizeof(*p));
     return p->len;
 }
+
+char *global_string;
 
 int main () {
     char *mystr = pls_create("Pippo pluto 123!", 16);
     pls_print(mystr);
+    global_string = mystr;
+    pls_retain(mystr);
+    pls_print(global_string);
     printf("My string lenght = %d\n", pls_len(mystr));
-    pls_free(mystr);
+    pls_release(mystr);
+    printf("%s\n", global_string);
+    pls_release(mystr);
+    pls_release(mystr);
+    return 0;
 }
