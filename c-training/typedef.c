@@ -16,4 +16,5 @@ int main() {
     f.d = 20;
     printf("%d/%d\n", f.n, f.d);
     printf("%d/%d\n", fp->n, fp->d);
+    printf("The fraction is stored at %p\n", fp);
 }
