@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <fcntl.h>
 
 int main() {
+    // Using library function
     FILE *fp = fopen("stdio1.c", "r");
     if (fp == NULL){
         printf("Unable to open the file\n");
@@ -16,4 +18,6 @@ int main() {
         }
     }
     fclose(fp);
+
+    return 0;
 }
