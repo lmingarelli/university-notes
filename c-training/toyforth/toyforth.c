@@ -82,8 +82,9 @@ tfobj *createBoolObject(int value) {
 }
 
 tfobj *createListObject(int value) {
-	tfobj *o = createObject(TFOBJ_TYPE_BOOL);
-	o->i = value;
+	tfobj *o = createObject(TFOBJ_TYPE_LIST);
+	o->list.ele = NULL;
+	o->list.len = 0;
 	return o;
 }
 
@@ -94,6 +95,24 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "Usage: %s <filename>", argv[0]);
 		return 1;
 	}
+
+	FILE *fp = fopen(argv[1], "r");
+	if (fp == NULL) {
+		perror("Opening Toy Forth program");
+		return 1;
+	}
+	fseek(fp, 0, SEEK_END);
+	long file_size = ftell(fp);
+	char *prgtext = xmalloc(file_size + 1);
+	fseek(fp, 0, SEEK_SET);
+	fread(prgtext, file_size, 1, fp);
+	prgtext[file_size] = 0;
+	fclose(fp);
+
+	printf("Program text: %s\n", prgtext);
+
+
+
 
 	// tfobj *prg = compile(prgtext);
 	// 
