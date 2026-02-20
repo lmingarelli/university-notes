@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ctype.h>
 
 /* =================== Data structures ====================================== */
 
@@ -10,7 +11,7 @@
 #define TFOBJ_TYPE_LIST 3
 #define TFOBJ_TYPE_SYMBOL 4
 
-typedef struct {
+typedef struct tfobj {
 	int refcount;
 	int type; // TFOBJ_TYPE_*
 	union {
@@ -81,14 +82,66 @@ tfobj *createBoolObject(int value) {
 	return o;
 }
 
-tfobj *createListObject(int value) {
+/* =================== List objects ========================================= */
+
+tfobj *createListObject() {
 	tfobj *o = createObject(TFOBJ_TYPE_LIST);
 	o->list.ele = NULL;
 	o->list.len = 0;
 	return o;
 }
 
-/* =================== Main ================================================ */
+/* Add the new element at the end of the list 'list'.
+   It is up to the caller to increment the reference count of the
+   element added to the list, if needed. */
+void listPush(tfobj *l, tfobj *ele) {
+	l->list.ele = realloc(l->list.ele, sizeof(tfobj*) * (l->list.len + 1));
+	l->list.ele[l->list.len] = ele;
+	l->list.len++;
+}
+
+/* =================== Turn program into toy forth list ===================== */
+
+void parseSpaces(tfparser *parser) {
+	while (isspace(parser->p[0])) parser->p++;
+}
+
+tfobj *parseNumber(tfparser *parser) {
+	return NULL;
+}
+
+tfobj *compile(char* prg) {
+	tfparser parser;
+	parser.prg = prg;
+	parser.p = prg;
+
+	tfobj *parsed = createListObject();
+
+	while (parser.p) {
+		tfobj *o;
+		char *token_start = parser.p;
+
+		parseSpaces(&parser);
+		if (parser.p[0] == 0) break; // End of program reached.
+
+		if (isdigit(parser.p[0]) || parser.p[0] == '-') {
+			o = parseNumber(&parser);
+		} else {
+			o = NULL; // Invalid token format
+		}
+
+		// Check if the current token produced a parsing error
+		if (o == NULL) {
+			printf("Syntax error near: %32s ...\n", token_start);
+		} else {
+			listPush(parsed, o);
+		}
+	}
+
+	return parsed;
+}
+
+/* ==================== Main ================================================ */
 
 int main(int argc, char **argv) {
 	if (argc < 2) {
@@ -110,8 +163,6 @@ int main(int argc, char **argv) {
 	fclose(fp);
 
 	printf("Program text: %s\n", prgtext);
-
-
 
 
 	// tfobj *prg = compile(prgtext);
