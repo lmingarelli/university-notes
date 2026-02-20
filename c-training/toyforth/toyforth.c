@@ -10,6 +10,7 @@
 #define TFOBJ_TYPE_BOOL 2
 #define TFOBJ_TYPE_LIST 3
 #define TFOBJ_TYPE_SYMBOL 4
+#define MAX_NUM_LEN 128
 
 typedef struct tfobj {
 	int refcount;
@@ -107,7 +108,21 @@ void parseSpaces(tfparser *parser) {
 }
 
 tfobj *parseNumber(tfparser *parser) {
-	return NULL;
+	char buf[MAX_NUM_LEN];
+	char *start = parser->p;
+	char *end;
+
+	if (parser->p[0] == '-') parser->p++;
+	while (parser->p[0] && isdigit(parser->p[0])) parser->p++;
+	end = parser->p;
+	int numlen = end - start;
+	if (numlen >= MAX_NUM_LEN) return NULL;
+
+	memcpy(buf, start, numlen);
+	buf[numlen] = 0;
+
+	tfobj *o = createIntObject(atoi(buf));
+	return o;
 }
 
 tfobj *compile(char* prg) {
@@ -137,8 +152,48 @@ tfobj *compile(char* prg) {
 			listPush(parsed, o);
 		}
 	}
-
 	return parsed;
+
+}
+
+/* ==================== Program execution =================================== */
+
+void exec(tfobj *prg) {
+	printf("[");
+	for (size_t i = 0; i < prg->list.len; i++) {
+		tfobj *o = prg->list.ele[i];
+
+		switch (o->type) {
+			case TFOBJ_TYPE_INT:
+				printf("");
+				break;
+
+			case TFOBJ_TYPE_INT:
+				/* code */
+				break;
+
+			case TFOBJ_TYPE_INT:
+				/* code */
+				break;
+
+			case TFOBJ_TYPE_INT:
+				/* code */
+				break;
+
+			case TFOBJ_TYPE_INT:
+				/* code */
+				break;
+
+			case TFOBJ_TYPE_INT:
+				/* code */
+				break;
+
+			default:
+				break;
+		}
+	}
+	printf("]");
+
 }
 
 /* ==================== Main ================================================ */
@@ -165,9 +220,8 @@ int main(int argc, char **argv) {
 	printf("Program text: %s\n", prgtext);
 
 
-	// tfobj *prg = compile(prgtext);
-	// 
-	// exec(prgtext);
+	tfobj *prg = compile(prgtext);
+	exec(prg);
 	
 	return 0;
 }
