@@ -3,6 +3,13 @@
 #include <unistd.h>
 #include <ctype.h>
 
+#if DEBUG
+#include <stdio.h>
+#define DPRINTF(fmt, ...) fprintf(stderr, "DEBUG: " fmt "\n", ##__VA_ARGS__)
+#else
+#define DPRINTF(fmt, ...) ((void)0)
+#endif
+
 /* =================== Data structures ====================================== */
 
 #define TFOBJ_TYPE_INT 0
@@ -133,6 +140,7 @@ tfobj *compile(char* prg) {
 	tfobj *parsed = createListObject();
 
 	while (parser.p) {
+		usleep(100000);
 		tfobj *o;
 		char *token_start = parser.p;
 
@@ -141,9 +149,13 @@ tfobj *compile(char* prg) {
 
 		if (isdigit(parser.p[0]) || parser.p[0] == '-') {
 			o = parseNumber(&parser);
+			DPRINTF("Number token: %d", o->i);
 		} else {
 			o = NULL; // Invalid token format
+			DPRINTF("NULL token");
 		}
+
+
 
 		// Check if the current token produced a parsing error
 		if (o == NULL) {
@@ -159,33 +171,19 @@ tfobj *compile(char* prg) {
 /* ==================== Program execution =================================== */
 
 void exec(tfobj *prg) {
-	printf("[");
+	printf("[\n");
 	for (size_t i = 0; i < prg->list.len; i++) {
 		tfobj *o = prg->list.ele[i];
 
 		switch (o->type) {
 			case TFOBJ_TYPE_INT:
-				printf("");
+			case TFOBJ_TYPE_BOOL:
+				printf("%d\n", o->i);
 				break;
 
-			case TFOBJ_TYPE_INT:
-				/* code */
-				break;
-
-			case TFOBJ_TYPE_INT:
-				/* code */
-				break;
-
-			case TFOBJ_TYPE_INT:
-				/* code */
-				break;
-
-			case TFOBJ_TYPE_INT:
-				/* code */
-				break;
-
-			case TFOBJ_TYPE_INT:
-				/* code */
+			case TFOBJ_TYPE_STR:
+			case TFOBJ_TYPE_SYMBOL:
+				printf("%s\n", o->str.ptr);
 				break;
 
 			default:
@@ -218,7 +216,6 @@ int main(int argc, char **argv) {
 	fclose(fp);
 
 	printf("Program text: %s\n", prgtext);
-
 
 	tfobj *prg = compile(prgtext);
 	exec(prg);
