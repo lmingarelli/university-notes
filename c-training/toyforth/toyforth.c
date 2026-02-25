@@ -155,8 +155,6 @@ tfobj *compile(char* prg) {
 			DPRINTF("NULL token");
 		}
 
-
-
 		// Check if the current token produced a parsing error
 		if (o == NULL) {
 			printf("Syntax error near: %32s ...\n", token_start);
@@ -170,28 +168,24 @@ tfobj *compile(char* prg) {
 
 /* ==================== Program execution =================================== */
 
-void exec(tfobj *prg) {
-	printf("[\n");
-	for (size_t i = 0; i < prg->list.len; i++) {
-		tfobj *o = prg->list.ele[i];
-
-		switch (o->type) {
-			case TFOBJ_TYPE_INT:
-			case TFOBJ_TYPE_BOOL:
-				printf("%d\n", o->i);
-				break;
-
-			case TFOBJ_TYPE_STR:
-			case TFOBJ_TYPE_SYMBOL:
-				printf("%s\n", o->str.ptr);
-				break;
-
-			default:
-				break;
+void print_object(tfobj *o) {
+	switch (o->type) {
+	case TFOBJ_TYPE_INT:
+		printf("%d", o->i);
+		break;
+	case TFOBJ_TYPE_LIST:
+		printf("[");
+		for (size_t i = 0; i < o->list.len; i++) {
+			tfobj *currO = o->list.ele[i];
+			print_object(currO);
+			if (i != (o->list.len) -1 ) printf(" ");
 		}
+		printf("]");
+		break;
+	default:
+		printf("Undefined object %d\n", o->type);
+		break;
 	}
-	printf("]");
-
 }
 
 /* ==================== Main ================================================ */
@@ -215,10 +209,10 @@ int main(int argc, char **argv) {
 	prgtext[file_size] = 0;
 	fclose(fp);
 
-	printf("Program text: %s\n", prgtext);
+	printf("Program text (string): %s\n", prgtext);
 
 	tfobj *prg = compile(prgtext);
-	exec(prg);
+	print_object(prg);
 	
 	return 0;
 }
