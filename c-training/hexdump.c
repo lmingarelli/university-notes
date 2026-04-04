@@ -5,7 +5,7 @@
 
 struct pls {
     long len;
-    char str[20];
+    char str[21];
 };
 
 #define HEXDUMP_CHAR_PER_LINE 8
@@ -44,6 +44,7 @@ int main() {
     printf("%p\n", &s);
     printf("%p\n", &s.str);
 
+    printf("%d\n", sizeof(s));
     hexdump(&s, sizeof(s));
     return 0;
 }
